@@ -1,4 +1,5 @@
 from random import uniform
+import matplotlib.pyplot as plt
 
 
 class Neural:
@@ -34,7 +35,8 @@ class Neural:
             self.weights[i] = self.weights[i] + self.step * (self.excepted_output - self.output) * self.values[i]
 
     def __str__(self):
-        return f"Weights: {self.weights}, Output: {self.output}, Excepted output: {self.excepted_output}"
+        return f"Weights: {self.weights}, Output: {self.output}, Excepted output: {self.excepted_output}, " \
+               f"Diff: {abs(self.excepted_output-self.output)}"
 
 
 def single_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_input):
@@ -47,6 +49,7 @@ def single_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_
     for i in range(epochs):
         neural.calculate_output()
         neural.update_weights()
+        to_print.append(abs(neural.excepted_output-neural.output))
         print(f"{i }: {neural}")
 
 
@@ -69,11 +72,14 @@ def multi_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_i
     neural.calculate_output()
     neural.update_weights()
     for x in range(epochs):
+        total_error = 0.0
         for i in range(len(input_patterns)):
             neural.update_data(input_patterns[i], excepted_outputs[i])
             neural.calculate_output()
             neural.update_weights()
+            total_error += abs(neural.output-neural.excepted_output)
             print(f"Epoch: {x}, Pattern: {i}, Inputs: {neural.values}, {neural}")
+        to_print.append(total_error)
 
 
 def pattern_loader(filename):
@@ -93,15 +99,26 @@ def pattern_loader(filename):
 
 
 if __name__ == "__main__":
+    to_print = []
     input_patterns, excepted_results = pattern_loader("examples/patterns6.txt")
     INPUTS = len(input_patterns[0])
     EPOCHS = 1000
-    STEP = 0.001
+    STEP = 0.01
     MIN_WEIGHT = 0.0
     MAX_WEIGHT = 1.0
     MIN_INPUT = -1.0
     MAX_INPUT = 1.0
 
-    # # single_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT)
-    multi_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT, input_patterns, excepted_results)
+    # single_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT)
+    multi_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT)
+    # na początku byly dane testowe na wikampie i zdazylem dla nich zrobic a potem stokfi wyjebal i losowe kazal wiec
+    # to wyzej jest losowe a to nizej dla tych z plikow
+    # multi_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT, input_patterns, excepted_results)
+
+    plt.plot([x for x in range(EPOCHS)], to_print)
+    # plt.show()
+    plt.xlabel("epoch")
+    plt.ylabel("training error")
+    plt.savefig(f'mpc1.png')
+
 
