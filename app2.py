@@ -68,10 +68,10 @@ if __name__ == '__main__':
     neural_y.set_weights(y)
     neural_z.set_weights(z)
 
-    new_letter = [1, 0, 0, 0,
+    new_letter = [1, 0, 0, 1,
                   0, 1, 1, 0,
-                  0, 1, 1, 1,
-                  1, 0, 1, 1]
+                  0, 1, 1, 0,
+                  1, 0, 0, 1]
     normalize(new_letter)
 
     print(predict(new_letter, neural_x, neural_y, neural_z))

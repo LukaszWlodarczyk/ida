@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 
 
 class Neural:
-    def __init__(self, inputs):
-        self.inputs = inputs
+    def __init__(self):
         self.values = []
         self.weights = []
         self.excepted_output = 0.0
@@ -39,10 +38,10 @@ class Neural:
                f"Diff: {abs(self.excepted_output-self.output)}"
 
 
-def single_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_input):
-    neural = Neural(inputs)
+def single_pattern(input_size, epochs, step, min_weight, max_weight, min_input, max_input):
+    neural = Neural()
     neural.step = step
-    input_values = [uniform(min_input, max_input) for x in range(inputs)]
+    input_values = [uniform(min_input, max_input) for x in range(input_size)]
     excepted_output = uniform(min_input, max_input)
     neural.put_data(input_values, excepted_output)
     neural.init_weights(min_weight, max_weight)
@@ -53,9 +52,9 @@ def single_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_
         print(f"{i }: {neural}")
 
 
-def multi_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_input,
+def multi_pattern(inputs, input_size, epochs, step, min_weight, max_weight, min_input, max_input,
                   custom_input=None, custom_excepted_results=None):
-    neural = Neural(inputs)
+    neural = Neural()
     neural.step = step
     input_patterns = []
     excepted_outputs = []
@@ -63,8 +62,8 @@ def multi_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_i
         input_patterns = custom_input
         excepted_outputs = custom_excepted_results
     else:
-        for i in range(epochs):
-            input_patterns.append([uniform(min_input, max_input) for x in range(inputs)])
+        for i in range(inputs):
+            input_patterns.append([uniform(min_input, max_input) for x in range(input_size)])
             excepted_outputs.append(uniform(min_input, max_input))
 
     neural.put_data(input_patterns[0], excepted_outputs[0])
@@ -78,7 +77,8 @@ def multi_pattern(inputs, epochs, step, min_weight, max_weight, min_input, max_i
             neural.calculate_output()
             neural.update_weights()
             total_error += abs(neural.output-neural.excepted_output)
-            print(f"Epoch: {x}, Pattern: {i}, Inputs: {neural.values}, {neural}")
+            # if x in [1, 10, 25, 50, 100, 250, 1000]:
+            #     print(f"Epoch: {x}, Pattern: {i}, Inputs: {neural.values}, {neural}")
         to_print.append(total_error)
 
 
@@ -100,25 +100,35 @@ def pattern_loader(filename):
 
 if __name__ == "__main__":
     to_print = []
-    input_patterns, excepted_results = pattern_loader("examples/patterns6.txt")
-    INPUTS = len(input_patterns[0])
+    # input_patterns, excepted_results = pattern_loader("examples/patterns6.txt")
+    # INPUTS = len(input_patterns[0])
+    INPUTS = 6
+    INPUT_SIZE = 10
+
     EPOCHS = 1000
-    STEP = 0.01
+    STEP = 0.0001
     MIN_WEIGHT = 0.0
     MAX_WEIGHT = 1.0
-    MIN_INPUT = -1.0
-    MAX_INPUT = 1.0
+    MIN_INPUT = -10.0
+    MAX_INPUT = 10.0
 
     # single_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT)
-    multi_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT)
+    multi_pattern(INPUTS, INPUT_SIZE, EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT)
     # na początku byly dane testowe na wikampie i zdazylem dla nich zrobic a potem stokfi wyjebal i losowe kazal wiec
     # to wyzej jest losowe a to nizej dla tych z plikow
     # multi_pattern(INPUTS,EPOCHS,STEP,MIN_WEIGHT,MAX_WEIGHT,MIN_INPUT,MAX_INPUT, input_patterns, excepted_results)
 
+    print(f"epoch 1: {to_print[0]} \n"
+          f"epoch 10: {to_print[9]} \n"
+          f"epoch 25: {to_print[24]} \n"
+          f"epoch 50: {to_print[49]} \n"
+          f"epoch 100: {to_print[99]} \n"
+          f"epoch 250: {to_print[249]}\n"
+          f"epoch 1000: {to_print[999]}")
     plt.plot([x for x in range(EPOCHS)], to_print)
     # plt.show()
     plt.xlabel("epoch")
     plt.ylabel("training error")
-    plt.savefig(f'mpc1.png')
+    plt.savefig(f'mpc4.png')
 
 
